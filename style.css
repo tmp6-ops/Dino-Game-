@@ -1,203 +1,640 @@
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  user-select: none;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #f7f7f7;
-  font-family: 'Courier New', Courier, monospace;
-  color: #535353;
+    background: #09060f;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
 }
 
-.game-container {
-  width: 100%;
-  max-width: 650px;
-  background: #ffffff;
-  border: 2px solid #535353;
-  border-radius: 8px;
-  padding: 20px 20px 0 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  position: relative;
-  overflow: hidden;
+.game-wrapper {
+    width: 100%;
+    max-width: 900px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 15px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  letter-spacing: 2px;
-  margin-bottom: 10px;
-  color: #747474;
+/* --- HUD HEADER --- */
+.hud-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    background: rgba(18, 12, 32, 0.85);
+    border: 1px solid #4a2c75;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
 }
 
-.sound-toggle {
-  margin-right: auto;
-  cursor: pointer;
-  font-size: 1.1rem;
-  user-select: none;
-  opacity: 0.8;
-  transition: opacity 0.2s ease, transform 0.1s ease;
+.hud-left {
+    display: flex;
+    flex-direction: column;
 }
 
-.sound-toggle:hover {
-  opacity: 1;
-  transform: scale(1.1);
+.game-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #ff7700;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(255, 119, 0, 0.6);
 }
 
-.high-score {
-  opacity: 0.7;
+.stage-tag {
+    font-size: 11px;
+    color: #b388ff;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.game-board {
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
+.hud-center {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 250px;
 }
 
-/* Dino Character */
-.dino {
-  position: absolute;
-  bottom: 0;
-  left: 40px;
-  width: 44px;
-  height: 47px;
-  background-color: #535353;
-  border-radius: 6px 12px 4px 4px;
-  clip-path: polygon(
-    25% 0%, 90% 0%, 90% 30%, 100% 30%, 100% 50%, 75% 50%, 75% 65%, 
-    90% 65%, 90% 85%, 65% 85%, 65% 100%, 50% 100%, 50% 85%, 
-    40% 85%, 40% 100%, 25% 100%, 25% 75%, 0% 75%, 0% 45%, 25% 45%
-  );
-  z-index: 10;
+.meter-container, .boost-meter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-/* Eye */
-.dino::after {
-  content: '';
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  width: 4px;
-  height: 4px;
-  background-color: #ffffff;
-  border-radius: 50%;
+.meter-label {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #ccc;
 }
 
-/* Jump animation */
-.jump {
-  animation: jump-anim 550ms cubic-bezier(0.2, 0.7, 0.3, 1);
+.meter-bar, .boost-bar {
+    width: 100%;
+    height: 9px;
+    background: #1e1330;
+    border: 1px solid #5a3b8b;
+    border-radius: 5px;
+    overflow: hidden;
 }
 
-@keyframes jump-anim {
-  0% { bottom: 0; }
-  45% { bottom: 105px; }
-  55% { bottom: 105px; }
-  100% { bottom: 0; }
+.meter-fill {
+    height: 100%;
+    width: 15%;
+    background: linear-gradient(90deg, #ff9900 0%, #ff2200 100%);
+    box-shadow: 0 0 8px #ff4400;
+    transition: width 0.3s;
 }
 
-/* Cactus Obstacle */
-.cactus {
-  position: absolute;
-  bottom: 0;
-  right: -30px;
-  width: 24px;
-  height: 45px;
-  background-color: #535353;
-  border-radius: 4px;
-  z-index: 9;
+.boost-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+    box-shadow: 0 0 8px #00d2ff;
+    transition: width 0.1s;
 }
 
-/* Cactus branches */
-.cactus::before {
-  content: '';
-  position: absolute;
-  top: 10px;
-  left: -8px;
-  width: 8px;
-  height: 18px;
-  background-color: #535353;
-  border-radius: 4px 0 0 4px;
-  border-top: 5px solid #535353;
+.hud-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.cactus::after {
-  content: '';
-  position: absolute;
-  top: 16px;
-  right: -8px;
-  width: 8px;
-  height: 16px;
-  background-color: #535353;
-  border-radius: 0 4px 4px 0;
-  border-top: 5px solid #535353;
+.stats-row {
+    display: flex;
+    gap: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    font-size: 13px;
 }
 
-/* Ground Line */
-.ground {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #535353;
+.stat-box {
+    background: rgba(40, 20, 65, 0.7);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #7c4dff;
+    color: #eee;
 }
 
-/* Overlay for Game Over / Start */
+.stat-box span {
+    color: #ffbb00;
+}
+
+.audio-btn {
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: bold;
+    background: #281a44;
+    border: 1px solid #9c27b0;
+    padding: 6px 10px;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.audio-btn:hover {
+    background: #4a2c75;
+}
+
+/* --- 3D VIEWPORT WITH PERSPECTIVE --- */
+.viewport-3d {
+    width: 100%;
+    height: 480px;
+    position: relative;
+    border: 2px solid #542c85;
+    border-radius: 12px;
+    overflow: hidden;
+    perspective: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+    background: #0d0818;
+}
+
+/* Background Atmosphere (Halloween Sky & Moon) */
+.sky-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 190px;
+    background: linear-gradient(to bottom, #070312 0%, #20103b 70%, #3f1d6b 100%);
+    overflow: hidden;
+    transition: background 0.8s ease;
+}
+
+.halloween-moon {
+    position: absolute;
+    top: 25px;
+    right: 70px;
+    width: 70px;
+    height: 70px;
+    background: radial-gradient(circle, #ffeedd 35%, #ffbb33 80%, #ff8800 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 35px rgba(255, 170, 0, 0.75);
+}
+
+.spooky-bats {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="20" viewBox="0 0 60 20"><path d="M10 10 Q16 2 22 10 Q28 6 30 14 Q32 6 38 10 Q44 2 50 10 Q42 16 30 18 Q18 16 10 10 Z" fill="%230b0518"/></svg>');
+    background-repeat: repeat-x;
+    background-position: 0 30px;
+    opacity: 0.55;
+    animation: batsFly 18s linear infinite;
+}
+
+@keyframes batsFly {
+    from { background-position-x: 0; }
+    to { background-position-x: 600px; }
+}
+
+/* Road Plane with 3D Rotation */
+.road-perspective {
+    position: absolute;
+    top: 140px;
+    left: 50%;
+    transform: translateX(-50%) rotateX(65deg);
+    transform-origin: top center;
+    width: 480px;
+    height: 580px;
+}
+
+.road-surface {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #171124;
+    border-left: 8px solid #ff7700;
+    border-right: 8px solid #ff7700;
+    box-shadow: 0 0 25px rgba(255, 119, 0, 0.25) inset;
+    overflow: hidden;
+}
+
+/* Animated lane markers */
+.lane-divider {
+    position: absolute;
+    top: 0;
+    width: 5px;
+    height: 200%;
+    background-image: linear-gradient(to bottom, #a855f7 40%, transparent 40%);
+    background-size: 5px 60px;
+    animation: roadMove 0.6s linear infinite;
+}
+
+.divider-left {
+    left: 33.33%;
+}
+
+.divider-right {
+    left: 66.66%;
+}
+
+@keyframes roadMove {
+    from { transform: translateY(-60px); }
+    to { transform: translateY(0); }
+}
+
+/* Entities Layer (Road Obstacles, Boosts, Candies) */
+.entity-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Dynamic Road Obstacle Item */
+.road-item {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    transition: transform 0.05s linear;
+}
+
+/* Tombstone / Pumpkin / Barrier Types */
+.item-tombstone {
+    width: 54px;
+    height: 60px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 70"><path d="M12 70 L12 24 Q12 4 30 4 Q48 4 48 24 L48 70 Z" fill="%234d4d5e"/><path d="M26 22 L34 22 M30 18 L30 32" stroke="%23ff7700" stroke-width="3" stroke-linecap="round"/><text x="18" y="50" fill="%23aaa" font-size="12" font-family="monospace">R.I.P</text></svg>');
+}
+
+/* Jack-o-Lantern barrier */
+.item-pumpkin {
+    width: 56px;
+    height: 52px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 55"><ellipse cx="30" cy="30" rx="28" ry="24" fill="%23ff6600"/><ellipse cx="30" cy="30" rx="18" ry="24" fill="%23e65c00"/><rect x="27" y="2" width="6" height="10" rx="2" fill="%2338761d"/><polygon points="18,22 25,26 16,30" fill="%23ffff00"/><polygon points="42,22 35,26 44,30" fill="%23ffff00"/><path d="M18 36 Q30 46 42 36 Q30 40 18 36 Z" fill="%23ffff00"/></svg>');
+}
+
+/* High Web / Hanging Ghost (Duck under it!) */
+.item-highweb {
+    width: 75px;
+    height: 48px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 0 8px rgba(180, 230, 255, 0.7));
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 50"><path d="M10 0 Q40 38 70 0" stroke="%23eee" stroke-width="3" fill="none"/><path d="M25 12 Q40 42 55 12" stroke="%23eee" stroke-width="2" fill="none"/><circle cx="40" cy="32" r="6" fill="%23fff"/><circle cx="38" cy="31" r="1.5" fill="%23ff0055"/><circle cx="42" cy="31" r="1.5" fill="%23ff0055"/></svg>');
+}
+
+/* Sweet Candy Treat (Collectible) */
+.item-candy {
+    width: 36px;
+    height: 36px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 0 8px #ffeb3b);
+    animation: candyBounce 0.8s infinite alternate ease-in-out;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><circle cx="20" cy="20" r="12" fill="%23ff007f"/><path d="M12 20 Q20 12 28 20 Q20 28 12 20 Z" fill="%23ffeb3b"/><polygon points="6,12 12,20 6,28" fill="%23ff007f"/><polygon points="34,12 28,20 34,28" fill="%23ff007f"/></svg>');
+}
+
+@keyframes candyBounce {
+    0% { transform: translate(-50%, -50%) scale(0.9); }
+    100% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Speed Boost Up Potion (Collectible) */
+.item-boostup {
+    width: 38px;
+    height: 42px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    filter: drop-shadow(0 0 10px #00e5ff);
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 45"><path d="M14 6 L26 6 L26 12 L32 20 L32 38 Q32 44 20 44 Q8 44 8 38 L8 20 L14 12 Z" fill="%2300b0ff"/><path d="M10 24 Q20 30 30 24 L32 38 Q32 44 20 44 Q8 44 8 38 Z" fill="%2300e5ff"/><polygon points="18,18 24,18 20,28 25,28 17,40 19,30 15,30" fill="%23ffff00"/></svg>');
+}
+
+/* --- GIRL RUNNER AVATAR --- */
+.player-girl {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 90px;
+    z-index: 25;
+    transition: left 0.16s cubic-bezier(0.18, 0.89, 0.32, 1.25), bottom 0.2s;
+}
+
+.player-shadow {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 50%;
+}
+
+/* Detailed Witch/Adventurer Halloween Girl Sprite */
+.girl-sprite {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+    /* High resolution vector SVG of a spirited runner girl in stylish Halloween witch outfit */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 100"><defs><linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%25" stop-color="%23ff5e36"/><stop offset="100%25" stop-color="%23c2185b"/></linearGradient><linearGradient id="dressGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%25" stop-color="%237b1fa2"/><stop offset="100%25" stop-color="%234a148c"/></linearGradient></defs><path d="M12 18 Q4 32 6 48 Q10 44 14 36 Q15 48 20 54 Q18 36 20 28 Z" fill="url(%23hairGrad)"/><ellipse cx="35" cy="88" rx="16" ry="4" fill="rgba(0,0,0,0.3)"/><path d="M30 68 L28 88 L34 88 L35 70" fill="%23212121"/><rect x="26" y="86" width="10" height="5" rx="2" fill="%23ff9800"/><path d="M40 68 L42 88 L36 88 L35 70" fill="%23212121"/><rect x="36" y="86" width="10" height="5" rx="2" fill="%23ff9800"/><path d="M26 44 L44 44 L48 68 L22 68 Z" fill="url(%23dressGrad)"/><rect x="25" y="54" width="20" height="4" fill="%23ff9800"/><rect x="33" y="53" width="5" height="6" fill="%23ffd54f"/><circle cx="35" cy="28" r="11" fill="%23ffe0bd"/><circle cx="35" cy="27" r="12" fill="url(%23hairGrad)" clip-path="polygon(0 0, 70 0, 70 26, 0 26)"/><ellipse cx="35" cy="30" rx="9" ry="8" fill="%23ffe0bd"/><circle cx="38" cy="29" r="1.8" fill="%2329b6f6"/><path d="M20 22 L50 22 L38 2 Q35 0 32 2 Z" fill="%23311b92"/><ellipse cx="35" cy="22" rx="18" ry="3.5" fill="%234a148c"/><rect x="25" y="20" width="20" height="2.5" fill="%23ff9800"/><path d="M22 46 L14 58 L18 60 L24 50" fill="%23ffe0bd"/><circle cx="16" cy="62" r="5" fill="%23ff6d00"/><path d="M48 46 L56 58 L52 60 L46 50" fill="%23ffe0bd"/></svg>');
+}
+
+/* Stride alternate animation */
+.girl-sprite.running-step {
+    transform: scaleX(-1);
+}
+
+/* Girl Jumping */
+.player-girl.jumping {
+    bottom: 120px !important;
+}
+
+.player-girl.jumping .player-shadow {
+    transform: translateX(-50%) scale(0.6);
+    opacity: 0.3;
+}
+
+/* Girl Rolling / Ducking */
+.player-girl.rolling {
+    height: 48px !important;
+    bottom: 22px !important;
+}
+
+.player-girl.rolling .girl-sprite {
+    transform: scaleY(0.55) translateY(20px);
+}
+
+/* Nitro Boost Flames Effect */
+.boost-flames {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 38px;
+    background: radial-gradient(circle, #00ffff 10%, #0077ff 50%, transparent 80%);
+    border-radius: 50%;
+    filter: blur(2px);
+    animation: flamePulse 0.15s infinite alternate;
+}
+
+@keyframes flamePulse {
+    0% { transform: translateX(-50%) scale(0.8); opacity: 0.7; }
+    100% { transform: translateX(-50%) scale(1.3); opacity: 1; }
+}
+
+/* --- CHASING MONSTER (RIGHT BEHIND) --- */
+.chaser-monster {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 140px;
+    z-index: 30;
+    pointer-events: none;
+    transition: bottom 0.4s ease, left 0.3s ease;
+    filter: drop-shadow(0 -5px 15px rgba(255, 0, 0, 0.6));
+}
+
+.monster-body {
+    width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    /* Menacing Shadow Demon / Gargoyle SVG with glowing red horns, fangs and fiery aura */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140"><defs><radialGradient id="monsterGlow" cx="50%" cy="50%" r="50%"><stop offset="0%25" stop-color="%23ff0055"/><stop offset="60%25" stop-color="%231a051d"/><stop offset="100%25" stop-color="%23000000"/></radialGradient></defs><path d="M20 50 Q10 10 35 15 Q45 28 50 40 Q70 30 90 40 Q95 28 105 15 Q130 10 120 50 Q138 75 125 105 Q105 135 70 138 Q35 135 15 105 Q2 75 20 50 Z" fill="url(%23monsterGlow)"/><ellipse cx="48" cy="62" rx="10" ry="7" fill="%23ffff00"/><ellipse cx="50" cy="62" rx="3" ry="6" fill="%23ff0000"/><ellipse cx="92" cy="62" rx="10" ry="7" fill="%23ffff00"/><ellipse cx="90" cy="62" rx="3" ry="6" fill="%23ff0000"/><path d="M40 90 Q70 120 100 90 Q70 95 40 90 Z" fill="%23260408"/><polygon points="48,91 52,100 56,92" fill="%23ffffff"/><polygon points="62,93 66,103 70,93" fill="%23ffffff"/><polygon points="74,93 78,103 82,93" fill="%23ffffff"/><polygon points="86,92 90,100 94,91" fill="%23ffffff"/><path d="M4 80 Q25 90 35 80 M136 80 Q115 90 105 80" stroke="%23ff0055" stroke-width="4" stroke-linecap="round"/></svg>');
+    animation: monsterBreath 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes monsterBreath {
+    0% { transform: scale(0.96) translateY(2px); }
+    100% { transform: scale(1.04) translateY(-3px); }
+}
+
+/* Floating Banner Notification */
+.floating-banner {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 6, 28, 0.92);
+    border: 2px solid #ff7700;
+    color: #ffaa00;
+    font-size: 16px;
+    font-weight: 900;
+    padding: 10px 24px;
+    border-radius: 8px;
+    letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(255, 119, 0, 0.7);
+    z-index: 40;
+    animation: bannerPop 0.4s ease-out;
+}
+
+@keyframes bannerPop {
+    0% { transform: translateX(-50%) scale(0.6); opacity: 0; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+/* --- OVERLAYS --- */
 .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.85);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
-  z-index: 20;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(8, 4, 15, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    backdrop-filter: blur(4px);
 }
 
-.overlay.hidden {
-  display: none;
+.overlay-card {
+    max-width: 520px;
+    background: linear-gradient(135deg, #1b0e2f 0%, #0d0617 100%);
+    border: 2px solid #7c4dff;
+    border-radius: 12px;
+    padding: 26px;
+    text-align: center;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85);
 }
 
-.message {
-  font-size: 1.3rem;
-  font-weight: bold;
-  letter-spacing: 1px;
+.card-title {
+    font-size: 26px;
+    font-weight: 900;
+    color: #ff7700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 119, 0, 0.5);
+    margin-bottom: 8px;
 }
 
-.restart-btn {
-  padding: 8px 18px;
-  font-size: 0.95rem;
-  font-family: inherit;
-  background: #535353;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.15s ease;
+.card-desc {
+    font-size: 13.5px;
+    color: #c9b7e4;
+    line-height: 1.5;
+    margin-bottom: 16px;
 }
 
-.restart-btn:hover {
-  background: #333333;
+.controls-guide {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
-.instructions {
-  margin-top: 15px;
-  font-size: 0.9rem;
-  color: #777;
+.ctrl-chip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #4a2c75;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #e0d0f5;
 }
 
+.ctrl-chip b {
+    color: #ff9900;
+}
+
+.levels-preview {
+    font-size: 12px;
+    color: #a37df5;
+    margin-bottom: 18px;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+.primary-btn {
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #fff;
+    background: linear-gradient(180deg, #ff7700 0%, #c43800 100%);
+    border: 1px solid #ffa347;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(255, 102, 0, 0.4);
+    transition: all 0.2s;
+}
+
+.primary-btn:hover {
+    background: linear-gradient(180deg, #ff8c1a 0%, #e04400 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(255, 102, 0, 0.6);
+}
+
+.primary-btn:active {
+    transform: translateY(1px);
+}
+
+/* Level Up Card */
+.levelup-card {
+    border-color: #00e5ff;
+}
+
+.levelup-title {
+    color: #00e5ff;
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 6px;
+}
+
+#nextLevelName {
+    color: #ffcc00;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* Game Over Card */
+.gameover-card {
+    border-color: #ff1744;
+}
+
+.gameover-title {
+    color: #ff1744;
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    text-shadow: 0 0 12px rgba(255, 23, 68, 0.6);
+}
+
+.final-stat {
+    font-size: 15px;
+    color: #ddd;
+    margin-bottom: 6px;
+}
+
+/* --- MOBILE CONTROLS --- */
+.mobile-controls {
+    display: none;
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    padding: 0 15px;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 35;
+    pointer-events: auto;
+}
+
+.mob-vert {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mob-btn {
+    background: rgba(30, 16, 50, 0.85);
+    border: 2px solid #7c4dff;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 12px 18px;
+    border-radius: 8px;
+    touch-action: manipulation;
+}
+
+.boost-mob-btn {
+    background: linear-gradient(180deg, #00b0ff, #0066cc);
+    border-color: #80d8ff;
+}
+
+@media (max-width: 768px) {
+    .mobile-controls {
+        display: flex;
+    }
+    .hud-center {
+        width: 160px;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.footer-tips {
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #887a9e;
+    text-align: center;
+}

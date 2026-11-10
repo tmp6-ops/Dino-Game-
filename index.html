@@ -1,36 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chrome Dino Game</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Halloween Escape: Monster Chase 3D</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="game-container">
-    <div class="header">
-      <div class="sound-toggle" id="sound-btn" title="Toggle Sound">🔊</div>
-      <div class="high-score">HI <span id="high-score">00000</span></div>
-      <div class="score"><span id="score">00000</span></div>
+    <div class="game-wrapper">
+        <!-- Top HUD -->
+        <header class="hud-header">
+            <div class="hud-left">
+                <h1 class="game-title">🎃 HALLOWEEN ESCAPE</h1>
+                <div class="stage-tag" id="stageTag">STAGE 1: HAUNTED SUBURB</div>
+            </div>
+
+            <div class="hud-center">
+                <div class="meter-container" title="Monster Distance">
+                    <span class="meter-label">👹 MONSTER PROXIMITY</span>
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="monsterFill"></div>
+                    </div>
+                </div>
+
+                <div class="boost-meter-container" title="Speed Boost Energy">
+                    <span class="meter-label">⚡ BOOST ENERGY (Press E or SHIFT)</span>
+                    <div class="boost-bar">
+                        <div class="boost-fill" id="boostFill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hud-right">
+                <div class="stats-row">
+                    <div class="stat-box">CANDY: <span id="candyVal">0</span> 🍬</div>
+                    <div class="stat-box">SCORE: <span id="scoreVal">0000</span></div>
+                    <div class="stat-box">NEXT LVL: <span id="targetVal">500</span></div>
+                </div>
+                <div class="audio-btn" id="soundToggleBtn">🔊 Sound: ON</div>
+            </div>
+        </header>
+
+        <!-- Main 3D Road Stage Viewport -->
+        <div class="viewport-3d" id="viewport">
+            <!-- Sky / Moon / Spooky silhouettes -->
+            <div class="sky-background" id="skyBg">
+                <div class="halloween-moon"></div>
+                <div class="spooky-bats" id="batsLayer"></div>
+            </div>
+
+            <!-- Road with 3 lanes and perspective -->
+            <div class="road-perspective" id="roadPerspective">
+                <div class="road-surface" id="roadSurface">
+                    <div class="lane-divider divider-left"></div>
+                    <div class="lane-divider divider-right"></div>
+                    
+                    <!-- Dynamic spawned elements will live inside entity-layer -->
+                    <div class="entity-layer" id="entityLayer"></div>
+
+                    <!-- Girl Avatar Runner -->
+                    <div class="player-girl" id="playerGirl">
+                        <!-- Custom vector girl runner (witch costume / pumpkin bag / animated ponytail) -->
+                        <div class="girl-sprite" id="girlSprite"></div>
+                        <div class="player-shadow"></div>
+                        <div class="boost-flames hidden" id="boostFlames"></div>
+                    </div>
+
+                    <!-- Chasing Scary Monster right behind -->
+                    <div class="chaser-monster" id="monsterChaser">
+                        <div class="monster-eyes"></div>
+                        <div class="monster-body"></div>
+                        <div class="monster-shadow"></div>
+                        <div class="monster-claws"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In-game Notification Banner (Level transitions, boost ready) -->
+            <div class="floating-banner hidden" id="floatingBanner"></div>
+
+            <!-- Start / Ready Overlay -->
+            <div class="overlay" id="startOverlay">
+                <div class="overlay-card">
+                    <h2 class="card-title">RUN FOR YOUR LIFE!</h2>
+                    <p class="card-desc">It's Halloween night and an ancient shadowy beast has emerged! Dodge spooky obstacles, collect sweet treats, jump over tombstones, and slide under hanging webs.</p>
+                    
+                    <div class="controls-guide">
+                        <div class="ctrl-chip"><b>A / D</b> or <b>← / →</b> : Switch Lanes</div>
+                        <div class="ctrl-chip"><b>W / SPACE / ↑</b> : Jump</div>
+                        <div class="ctrl-chip"><b>S / ↓</b> : Roll / Slide</div>
+                        <div class="ctrl-chip"><b>E / SHIFT</b> : Nitro Boost!</div>
+                    </div>
+
+                    <div class="levels-preview">
+                        🎯 <b>5 Spooky Stages:</b> Haunted Suburbs &rarr; Graveyard &rarr; Witch Woods &rarr; Pumpkin Crypt &rarr; Infernal Castle
+                    </div>
+
+                    <button class="primary-btn" id="startBtn">START ESCAPING</button>
+                </div>
+            </div>
+
+            <!-- Level Up Announcement Overlay -->
+            <div class="overlay hidden" id="levelUpOverlay">
+                <div class="overlay-card levelup-card">
+                    <h2 class="levelup-title">STAGE COMPLETED!</h2>
+                    <h3 id="nextLevelName">NEXT: THE GRAVEYARD</h3>
+                    <p>The monster grows faster and more relentless! Keep running!</p>
+                    <button class="primary-btn" id="nextLevelBtn">ENTER NEXT LEVEL</button>
+                </div>
+            </div>
+
+            <!-- Game Over Overlay -->
+            <div class="overlay hidden" id="gameOverOverlay">
+                <div class="overlay-card gameover-card">
+                    <h2 class="gameover-title">CAUGHT IN THE DARK!</h2>
+                    <p class="final-stat" id="finalScoreMsg">Your Score: 0000</p>
+                    <p class="final-stat" id="finalCandiesMsg">Candies Collected: 0 🍬</p>
+                    <p class="final-stat" id="stageReachedMsg">Survived To: Stage 1</p>
+                    <button class="primary-btn" id="restartBtn">TRY AGAIN</button>
+                </div>
+            </div>
+
+            <!-- Touch Controls on Mobile / On-screen overlay -->
+            <div class="mobile-controls">
+                <button class="mob-btn" id="mobLeft">◀</button>
+                <div class="mob-vert">
+                    <button class="mob-btn" id="mobJump">▲ JUMP</button>
+                    <button class="mob-btn" id="mobRoll">▼ SLIDE</button>
+                </div>
+                <button class="mob-btn" id="mobRight">▶</button>
+                <button class="mob-btn boost-mob-btn" id="mobBoost">⚡ BOOST</button>
+            </div>
+        </div>
+
+        <!-- Footer Instructions -->
+        <footer class="footer-tips">
+            <p>⌨️ Controls: <b>A / D / ← →</b> Switch Lanes | <b>W / Space</b> Jump | <b>S / ↓</b> Roll Slide | <b>E / Shift</b> Boost | 📱 Touch Buttons on mobile</p>
+        </footer>
     </div>
 
-    <div class="game-board" id="game-board">
-      <div id="dino" class="dino"></div>
-      <div id="cactus" class="cactus"></div>
-      <div class="ground"></div>
-    </div>
-
-    <div class="overlay" id="overlay">
-      <div class="message" id="message">Press Space or Tap to Jump</div>
-      <button id="restart-btn" class="restart-btn">Play Again</button>
-    </div>
-  </div>
-
-  <div class="instructions">
-    <p>Controls: <strong>Spacebar</strong>, <strong>Up Arrow</strong>, or <strong>Tap/Click</strong> on screen to jump.</p>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-
